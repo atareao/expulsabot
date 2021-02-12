@@ -26,7 +26,7 @@ codefactor-badge: True
 <h1 align="center">Welcome to <span id="project_title">Expulsabot</span> 👋</h1>
 <p>
 <a href="https://www.atareao.es/aplicacion/expulsabot" id="homepage" rel="nofollow">
-<img align="right" height="128" id="icon" src="../../../../../../datos/Sync/Programacion/docker/expulsabot/expulsabot.svg" width="128"/>
+<img align="right" height="128" id="icon" src="expulsabot.svg" width="128"/>
 </a>
 </p>
 <h2>🏠 <a href="https://www.atareao.es/aplicacion/expulsabot" id="homepage">Homepage</a></h2>
