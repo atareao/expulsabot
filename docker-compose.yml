@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  expulsabot:
+    build: ./
+    image: atareao/expulsabot:amd64
+    container_name: expulsabot
+    restart: unless-stopped
+    networks:
+      - proxy
+    ports:
+      - 5500:5000
+    volumes:
+      - ./database:/app/database
+    env_file:
+      - expulsabot.env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.expulsabot.entrypoints=http
+      - traefik.http.routers.expulsabot.rule=Host(`expulsabot.territoriolinux.es`)
+      - traefik.http.middlewares.expulsabot-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.expulsabot.middlewares=expulsabot-https-redirect
+      - traefik.http.routers.expulsabot-secure.entrypoints=https
+      - traefik.http.routers.expulsabot-secure.rule=Host(`expulsabot.territoriolinux.es`)
+      - traefik.http.routers.expulsabot-secure.tls=true
+      - traefik.http.routers.expulsabot-secure.tls.certresolver=myresolver
+
+networks:
+  proxy:
+    external: true
