@@ -37,13 +37,7 @@ codefactor-badge: True
 <!-- start prerequisites -->
 ## Prerequisites
 
-Before you begin, ensure you have met the following requirements:
-
-```
-```
-
-
-
+All prerequisites are in the Docker File
 
 <!-- end prerequisites -->
 
@@ -52,15 +46,17 @@ Before you begin, ensure you have met the following requirements:
 
 To install <span id="project_title">Expulsabot</span>, follow these steps:
 
-* In a terminal (`Ctrl+Alt+T`), run these commands
+### Docker
 
 ```
-sudo add-apt-repository ppa:atareao/atareao
-sudo apt update
-sudo apt install readmemaker
+docker run -d --name=expulsabot \
+-p 5000:5000 \
+-v database:/app/database \
+-env-file ./expulsabot.env
+atareao/expulsabot:amd64
 ```
 
-
+Also you can use the `docker-compose.yml`. This is for using with Traefik, but must be work anyway.
 
 
 <!-- end installing -->
@@ -68,40 +64,11 @@ sudo apt install readmemaker
 <!-- start using -->
 ## Using <span id="project_title">Expulsabot</span>
 
-When you start <strong><span id="project_title">Expulsabot</span></strong> it show the folloging dialog4
+Before you start the expulsabot app, you must get a Telegram Bot working. So you  have the required parameter.
 
-In this main screen you can see 7 sections. First section is General, where you can fill the main parameters for your project. The Title of the project, the GitHub project, the license of the project, and others.
+The courtesy_time, is the time `expulsabot` wait until kick a user if not answer.
 
-![readmemaker](./screenshots/readmemaker-screenshot-01.png)
-
-The second section is **description**, where you can introduce to the user the objective of your application. A short description.
-
-![readmemaker](./screenshots/readmemaker-screenshot-02.png)
-
-The prerequisistes are in the third section where you must talk about the dependencies for your project.
-
-![readmemaker](./screenshots/readmemaker-screenshot-03.png)
-
-After that, in the four section, you must tell how to install your project, so the user can enjoy with it.
-
-![readmemaker](./screenshots/readmemaker-screenshot-04.png)
-
-Maybe, the fifth section is the most important, becouse is the place where you tell how to use your proyect.
-
-![readmemaker](./screenshots/readmemaker-screenshot-05.png)
-
-Another important section is the sixth section, where you specify how every one can contribute to this project
-
-![readmemaker](./screenshots/readmemaker-screenshot-06.png)
-
-Y at last a mention for everyone that contributed to this project
-
-![readmemaker](./screenshots/readmemaker-screenshot-07.png)
-
-The information about contributors from GitHub
-
-![readmemaker](./screenshots/readmemaker-screenshot-08.png)
-
+The webhook is a the endpoint, you must tell Telegram to point to. If your url is `https://expulsabot.tuservidor.com`, and the WEBHOOK is `bfc7dabd-27ef-4f27-9eeb-55726e388335`... You must tell Telegram following url `https://expulsabot.tuservidor.com/bfc7dabd-27ef-4f27-9eeb-55726e388335`
 
 <!-- end using -->
 
