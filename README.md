@@ -70,6 +70,8 @@ The courtesy_time, is the time `expulsabot` wait until kick a user if not answer
 
 The webhook is a the endpoint, you must tell Telegram to point to. If your url is `https://expulsabot.tuservidor.com`, and the WEBHOOK is `bfc7dabd-27ef-4f27-9eeb-55726e388335`... You must tell Telegram following url `https://expulsabot.tuservidor.com/bfc7dabd-27ef-4f27-9eeb-55726e388335`
 
+To get a webhook you can use a [uuid generator](https://www.uuidgenerator.net/)
+
 <!-- end using -->
 
 <!-- start contributing -->
