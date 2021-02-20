@@ -56,7 +56,7 @@ docker run -d --name=expulsabot \
 atareao/expulsabot:amd64
 ```
 
-Also you can use the `docker-compose.yml`. This is for using with Traefik, but must be work anyway.
+Also you can use the `docker-compose.yml`. This is for using with Traefik, but must be work without it anyway.
 
 
 <!-- end installing -->
@@ -68,7 +68,7 @@ Before you start the expulsabot app, you must get a Telegram Bot working. So you
 
 The courtesy_time, is the time `expulsabot` wait until kick a user if not answer.
 
-The webhook is a the endpoint, you must tell Telegram to point to. If your url is `https://expulsabot.tuservidor.com`, and the WEBHOOK is `bfc7dabd-27ef-4f27-9eeb-55726e388335`... You must tell Telegram following url `https://expulsabot.tuservidor.com/bfc7dabd-27ef-4f27-9eeb-55726e388335`
+The webhook is a the endpoint, you must tell Telegram to point to. If your url is `https://expulsabot.tuservidor.com`, and the WEBHOOK is `bfc7dabd-27ef-4f27-9eeb-55726e388335`... You must tell Telegram following url `https://expulsabot.tuservidor.com/webhook/bfc7dabd-27ef-4f27-9eeb-55726e388335` (remember add `/webhook/` path to url before uuid).
 
 To get a webhook you can use a [uuid generator](https://www.uuidgenerator.net/)
 
