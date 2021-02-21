@@ -75,6 +75,15 @@ class User():
         return None
 
     @classmethod
+    def unban(cls, user_id):
+        sqlquery = 'UPDATE USERS SET IS_BOT = ?, TIMESTAMP = 0 WHERE TELEGRAM_ID = ?'
+        logger(sqlquery)
+        data = (HUMAN, hashea(user_id))
+        logger(data)
+        execute(sqlquery, data)
+        return cls.get_user(user_id)
+
+    @classmethod
     def insert_user(cls, member, chat_id, is_bot=False):
         sqlquery = 'INSERT INTO USERS (TELEGRAM_ID, TIMESTAMP, IS_BOT) VALUES(?, ?, ?)'
         logger(sqlquery)
@@ -91,5 +100,5 @@ class User():
         user = 'Id: {}\n'.format(self._id)
         user += 'Telegram Id: {}\n'.format(self._telegram_id)
         user += 'Timestamp: {}\n'.format(self._timestamp)
-        user += 'Is bot: {}\n'.format(self._is_bot)
+        user += 'Is bot: {}\n'.format(self._is_bot == BOT)
         return user

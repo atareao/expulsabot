@@ -8,8 +8,6 @@ services:
     restart: unless-stopped
     networks:
       - proxy
-    ports:
-      - 5500:5000
     volumes:
       - ./database:/app/database
     env_file:
