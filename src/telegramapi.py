@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import requests
-from apidb import logger
-import json
+
 
 URL = 'https://api.telegram.org/bot{}'
+
 
 class Telegram():
     def __init__(self, token):
@@ -33,3 +33,11 @@ class Telegram():
         url = URL.format(self._token) + '/kickChatMember'
         data = {'chat_id': chat_id, 'user_id': user_id}
         requests.post(url, data=data)
+
+    def get_chat_member(self, chat_id, user_id):
+        url = URL.format(self._token) + '/getChatMember'
+        data = {'chat_id': chat_id, 'user_id': user_id}
+        r = requests.post(url, data=data)
+        if r.status_code == 200 and 'ok' in r.json() and r.json()['ok']:
+            return r.json()['result']
+        return None
