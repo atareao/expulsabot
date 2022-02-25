@@ -19,7 +19,7 @@ def get_status():
     return 'Up and running', 201
 
 def insert_into_influxdb(bot):
-    url = os.environ['INFLUXDB_URL']
+    url = os.getenv('INFLUXDB_URL')
     if url:
         data = '{} value=1'.format('bot' if bot else 'human')
         headers = {'Content-type': 'application/octet-stream'}
