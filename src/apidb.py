@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sqlite3
 import time
+import os
 import sys
 
 
@@ -14,9 +15,10 @@ IS_BOT INTEGER);
 """
 
 
-def logger(message):
-    timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
-    sys.stdout.write('{} | {}\n'.format(timestamp, message))
+def logger(message, force=False):
+    if force or (os.environ['DEBUG'] and os.environ['DEBUG'].lower() == 'true'):
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
+        sys.stdout.write('{} | {}\n'.format(timestamp, message))
 
 
 def init():
@@ -36,7 +38,7 @@ def execute(sqlquery, data=None):
             cursor.execute(sqlquery)
         conn.commit()
     except Exception as e:
-        logger(e)
+        logger(e, True)
     finally:
         if conn:
             conn.close()
@@ -52,7 +54,7 @@ def select(sqlquery, one=False):
             return cursor.fetchone()
         return cursor.fetchall()
     except Exception as e:
-        logger(e)
+        logger(e, True)
     finally:
         if conn:
             conn.close()
@@ -66,7 +68,7 @@ def check(sqlquery):
         cursor.execute(sqlquery)
         return True
     except Exception as e:
-        logger(e)
+        logger(e, True)
     finally:
         if conn:
             conn.close()

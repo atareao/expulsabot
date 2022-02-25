@@ -19,20 +19,21 @@ def get_status():
     return 'Up and running', 201
 
 def insert_into_influxdb(bot):
-    data = '{} value=1'.format('bot' if bot else 'human')
-    url = 'https://influxdb.territoriolinux.es/write?db=telegraf'
-    headers = {'Content-type': 'application/octet-stream'}
-    try:
-        res = requests.post(url=url, data=data, headers=headers)
-    except Exception:
-        logger('Can\'t write in inbluxdb')
+    url = os.getenv('INFLUXDB_URL')
+    if url:
+        data = '{} value=1'.format('bot' if bot else 'human')
+        headers = {'Content-type': 'application/octet-stream'}
+        try:
+            res = requests.post(url=url, data=data, headers=headers)
+        except Exception as exception:
+            logger('Can\'t write in inbluxdb ({})'.format(exception), True)
 
 def wait_for_new_user(member, chat_id, result):
-    time.sleep(int(os.environ['COURTESY_TIME']))
+    time.sleep(int(os.getenv('COURTESY_TIME', 120)))
     user = User.get_user(member['id'])
     logger(user)
     logger(json.dumps(result))
-    if user.get_timestamp() > 0:
+    if user and user.get_timestamp() > 0:
         user.set_timestamp(0)
         user.set_is_bot(True)
         user.save()
@@ -44,12 +45,13 @@ def wait_for_new_user(member, chat_id, result):
 @app.route('/webhook/<webhook>', methods=['GET', 'POST'])
 def get_webhook(webhook):
     logger(webhook)
-    if os.environ['WEBHOOK'] != webhook:
+    if not os.getenv('WEBHOOK') | os.getenv('WEBHOOK') != webhook:
         return 'KO', 404
     try:
         if request.method == 'GET' or not request.json:
             return 'OK', 200
-    except Exception:
+    except Exception as exception:
+        logger(exception, True)
         return 'OK', 200
     telegram = Telegram(os.environ['TELEGRAM_API_TOKEN'])
     logger(request.json)
@@ -62,7 +64,7 @@ def get_webhook(webhook):
         if user:
             logger(user)
             delta = int(time.time()) - int(user.get_timestamp())
-            if (user.get_timestamp() > 0 and delta > int(os.environ['COURTESY_TIME'])) \
+            if (user.get_timestamp() > 0 and delta > int(os.getenv('COURTESY_TIME', 120))) \
                     or user.get_is_bot():
                 user.set_timestamp(0)
                 user.set_is_bot(True)
@@ -102,7 +104,7 @@ def get_webhook(webhook):
             result = telegram.send_message(
                     chat_id,
                     'Hola {}, selecciona el pingüino, en menos de {} segundos'.format(
-                        mention, os.environ['COURTESY_TIME']),
+                        mention, os.getenv('COURTESY_TIME', 120)),
                     json.dumps(inline_keyboard))
             t1 = threading.Thread(target=wait_for_new_user, args=(member,
                 chat_id, result))
@@ -132,8 +134,36 @@ def get_webhook(webhook):
         message_id = payload['message']['message_id']
         if User.get_bots(from_id):
             telegram.delete_message(chat_id, message_id)
+        elif 'entities' in payload['message']:
+            for entity in payload['message']['entities']:
+                if 'type' in entity and entity['type'] == 'bot_command':
+                    instruction = payload['message']['text']
+                    start = entity['offset'] + 1
+                    end = start + entity['length']
+                    command = instruction[start:end - 1]
+                    args = instruction[end:]
+                    do_telegram_command(chat_id, message_id, from_id, command, args)
+                    break
     return 'OK', 201
 
+
+def do_telegram_command(chat_id, message_id, from_id, command, args):
+    telegram = Telegram(os.environ['TELEGRAM_API_TOKEN'])
+    if command == 'unban':
+        telegram.delete_message(chat_id, message_id)
+        user = telegram.get_chat_member(chat_id, from_id)
+        if 'status' in user and user['status'] in ['creator', 'administrator']:
+            user = User.get_user(args)
+            message = 'Mission failed'
+            if user:
+                user.set_timestamp(0)
+                user.set_is_bot(False)
+                user.save()
+                user = User.get_user(args)
+                if user and user.get_is_bot() == False:
+                    message = 'Mission accomplished'
+            telegram.send_message(chat_id, message)
+        
 
 @app.errorhandler(404)
 def not_found(error):
