@@ -29,7 +29,7 @@ def insert_into_influxdb(bot):
             logger('Can\'t write in inbluxdb ({})'.format(exception), True)
 
 def wait_for_new_user(member, chat_id, result):
-    time.sleep(int(os.environ['COURTESY_TIME']))
+    time.sleep(int(os.getenv('COURTESY_TIME', 120)))
     user = User.get_user(member['id'])
     logger(user)
     logger(json.dumps(result))
@@ -45,7 +45,7 @@ def wait_for_new_user(member, chat_id, result):
 @app.route('/webhook/<webhook>', methods=['GET', 'POST'])
 def get_webhook(webhook):
     logger(webhook)
-    if os.environ['WEBHOOK'] != webhook:
+    if not os.getenv('WEBHOOK') | os.getenv('WEBHOOK') != webhook:
         return 'KO', 404
     try:
         if request.method == 'GET' or not request.json:
@@ -64,7 +64,7 @@ def get_webhook(webhook):
         if user:
             logger(user)
             delta = int(time.time()) - int(user.get_timestamp())
-            if (user.get_timestamp() > 0 and delta > int(os.environ['COURTESY_TIME'])) \
+            if (user.get_timestamp() > 0 and delta > int(os.getenv('COURTESY_TIME', 120))) \
                     or user.get_is_bot():
                 user.set_timestamp(0)
                 user.set_is_bot(True)
@@ -104,7 +104,7 @@ def get_webhook(webhook):
             result = telegram.send_message(
                     chat_id,
                     'Hola {}, selecciona el pingüino, en menos de {} segundos'.format(
-                        mention, os.environ['COURTESY_TIME']),
+                        mention, os.getenv('COURTESY_TIME', 120)),
                     json.dumps(inline_keyboard))
             t1 = threading.Thread(target=wait_for_new_user, args=(member,
                 chat_id, result))
