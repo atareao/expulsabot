@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  expulsabot:
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.expulsabot.entrypoints=http
+      - traefik.http.routers.expulsabot.rule=Host(`expulsabot.tuservidor.com`)
+      - traefik.http.middlewares.expulsabot-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.expulsabot.middlewares=expulsabot-https-redirect
+      - traefik.http.routers.expulsabot-secure.entrypoints=https
+      - traefik.http.routers.expulsabot-secure.rule=Host(`expulsabot.tuservidor.com`)
+      - traefik.http.routers.expulsabot-secure.tls=true
+      - traefik.http.routers.expulsabot-secure.tls.certresolver=myresolver
+
+networks:
+  proxy:
+    external: true
+
