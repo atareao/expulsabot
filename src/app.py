@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, jsonify, make_response, abort, url_for, request
+from flask import Flask, jsonify, make_response, request
 from user import User
 from apidb import logger, check, init
 from telegramapi import Telegram
@@ -7,7 +7,6 @@ import threading
 import random
 import time
 import os
-import sys
 import json
 import requests
 
@@ -24,7 +23,7 @@ def insert_into_influxdb(bot):
         data = '{} value=1'.format('bot' if bot else 'human')
         headers = {'Content-type': 'application/octet-stream'}
         try:
-            res = requests.post(url=url, data=data, headers=headers)
+            requests.post(url=url, data=data, headers=headers)
         except Exception as exception:
             logger('Can\'t write in inbluxdb ({})'.format(exception), True)
 
@@ -33,7 +32,7 @@ def wait_for_new_user(member, chat_id, result):
     user = User.get_user(member['id'])
     logger(user)
     logger(json.dumps(result))
-    if user and user.get_timestamp() > 0:
+    if user is not None and user.get_timestamp() > 0:
         user.set_timestamp(0)
         user.set_is_bot(True)
         user.save()
@@ -45,7 +44,7 @@ def wait_for_new_user(member, chat_id, result):
 @app.route('/webhook/<webhook>', methods=['GET', 'POST'])
 def get_webhook(webhook):
     logger(webhook)
-    if not os.getenv('WEBHOOK') | os.getenv('WEBHOOK') != webhook:
+    if not os.getenv('WEBHOOK') or os.getenv('WEBHOOK') != webhook:
         return 'KO', 404
     try:
         if request.method == 'GET' or not request.json:
@@ -64,7 +63,8 @@ def get_webhook(webhook):
         if user:
             logger(user)
             delta = int(time.time()) - int(user.get_timestamp())
-            if (user.get_timestamp() > 0 and delta > int(os.getenv('COURTESY_TIME', 120))) \
+            if (user.get_timestamp() > 0 and
+                    delta > int(os.getenv('COURTESY_TIME', 120))) \
                     or user.get_is_bot():
                 user.set_timestamp(0)
                 user.set_is_bot(True)
@@ -88,7 +88,7 @@ def get_webhook(webhook):
             buttons = []
             buttons.append({'text': '🐼',
                             'callback_data': 'ko|{}'.format(member['id'])})
-            buttons.append({'text': '🦝', 
+            buttons.append({'text': '🦝',
                             'callback_data': 'ko|{}'.format(member['id'])})
             buttons.append({'text': '🐧',
                             'callback_data': 'ok|{}'.format(member['id'])})
@@ -119,7 +119,7 @@ def get_webhook(webhook):
             user = User.get_user(member['id'])
             if not user:
                 user = User.insert_user(member, chat_id)
-            if user and user.get_timestamp() > 0:
+            if user is not None and user.get_timestamp() > 0:
                 user.set_timestamp(0)
                 user.set_is_bot(result == 'ko')
                 user.save()
@@ -152,7 +152,8 @@ def do_telegram_command(chat_id, message_id, from_id, command, args):
     if command == 'unban':
         telegram.delete_message(chat_id, message_id)
         user = telegram.get_chat_member(chat_id, from_id)
-        if 'status' in user and user['status'] in ['creator', 'administrator']:
+        if user is not None and 'status' in user and \
+                user['status'] in ['creator', 'administrator']:
             user = User.get_user(args)
             message = 'Mission failed'
             if user:
@@ -163,11 +164,12 @@ def do_telegram_command(chat_id, message_id, from_id, command, args):
                 if user and user.get_is_bot() == False:
                     message = 'Mission accomplished'
             telegram.send_message(chat_id, message)
-        
+
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+    return make_response(jsonify({'error': 'Not found',
+                                  'msg': str(error)}), 404)
 
 
 if __name__ == '__main__':

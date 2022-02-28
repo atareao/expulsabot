@@ -1,2 +1,6 @@
-python3-flask
-python3-request
+flask
+gunicorn
+itsdangerous
+requests
+pyinotify
+werkzeug

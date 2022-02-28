@@ -16,7 +16,7 @@ class User():
     def __init__(self):
         self._id = None
         self._telegram_id = None
-        self._timestamp = None
+        self._timestamp = 0
         self._is_bot = None
 
     def get_id(self):
