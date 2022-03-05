@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+"""user"""
 import time
 import hashlib
 from apidb import execute, select, logger
@@ -84,7 +86,7 @@ class User():
         return cls.get_user(user_id)
 
     @classmethod
-    def insert_user(cls, member, chat_id, is_bot=False):
+    def insert_user(cls, member, is_bot=False):
         sqlquery = 'INSERT INTO USERS (TELEGRAM_ID, TIMESTAMP, IS_BOT) VALUES(?, ?, ?)'
         logger(sqlquery)
         if is_bot or member['is_bot']:

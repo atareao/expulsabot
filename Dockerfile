@@ -1,5 +1,6 @@
-FROM alpine:3.15 as builder
+FROM alpine:3.15
 
+ENV TZ=Europe/Madrid
 LABEL maintainer="Lorenzo Carbonell <a.k.a. atareao> lorenzo.carbonell.cerezo@gmail.com"
 
 ARG UID=${EB_UID:-1000}
@@ -12,9 +13,9 @@ ENV PYTHONUNBUFFERED=1
 
 RUN echo "**** install Python ****" && \
     apk add --update --no-cache \
-            tini \
-            tzdata \
-            python3 && \
+            tini==0.19.0-r0 \
+            tzdata==2021e-r0 \
+            python3==3.9.7-r4 && \
     rm -rf /var/lib/apt/lists/* && \
     echo "**** create user ****" && \
     addgroup dockerus && \
