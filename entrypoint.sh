@@ -21,4 +21,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-/opt/venv/bin/gunicorn app:app -w 2 --chdir /app/src --threads 2 --access-logfile - -b 0.0.0.0:8000
+/opt/venv/bin/gunicorn app:app -w 1 --chdir /app/src --threads 1 --access-logfile - -b 0.0.0.0:8000
