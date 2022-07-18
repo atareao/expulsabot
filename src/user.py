@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """user"""
 import time
 import hashlib
@@ -9,10 +9,12 @@ from apidb import execute, select, logger
 BOT = 0
 HUMAN = 1
 
+
 def hashea(code):
     h = hashlib.md5()
     h.update(str(code).encode('utf-8'))
     return h.hexdigest()
+
 
 class User():
     def __init__(self):
@@ -69,7 +71,8 @@ class User():
 
     @classmethod
     def get_user(cls, telegram_id):
-        sqlquery = 'SELECT * FROM USERS WHERE TELEGRAM_ID=\'{}\''.format(hashea(telegram_id))
+        sqlquery = 'SELECT * FROM USERS WHERE TELEGRAM_ID=\'{}\''.format(
+                hashea(telegram_id))
         logger(sqlquery)
         result = select(sqlquery, True)
         if result:
@@ -78,7 +81,8 @@ class User():
 
     @classmethod
     def unban(cls, user_id):
-        sqlquery = 'UPDATE USERS SET IS_BOT = ?, TIMESTAMP = 0 WHERE TELEGRAM_ID = ?'
+        sqlquery = ('UPDATE USERS SET IS_BOT = ?, TIMESTAMP = 0 '
+                    'WHERE TELEGRAM_ID = ?')
         logger(sqlquery)
         data = (HUMAN, hashea(user_id))
         logger(data)
@@ -87,16 +91,17 @@ class User():
 
     @classmethod
     def insert_user(cls, member, is_bot=False):
-        sqlquery = 'INSERT INTO USERS (TELEGRAM_ID, TIMESTAMP, IS_BOT) VALUES(?, ?, ?)'
+        sqlquery = ('INSERT INTO USERS '
+                    '(TELEGRAM_ID, TIMESTAMP, IS_BOT) '
+                    'VALUES(?, ?, ?)')
         logger(sqlquery)
         if is_bot or member['is_bot']:
-           is_bot = BOT
+            is_bot = BOT
         else:
-           is_bot = HUMAN
+            is_bot = HUMAN
         data = (hashea(member['id']), int(time.time()), is_bot)
         execute(sqlquery, data)
         return cls.get_user(member['id'])
-
 
     def __str__(self):
         user = 'Id: {}\n'.format(self._id)
