@@ -11,4 +11,4 @@ tag:
     docker tag {{user}}/{{name}}:{{version}} {{user}}/{{name}}:latest
 
 push:
-    docker push reg/user/image --all-tags
+    docker push {{user}}/{{name}} --all-tags
