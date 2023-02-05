@@ -118,7 +118,7 @@ def do_kick_user(telegram, user, member, chat_id):
         insert_into_influxdb(True)
 
 
-def do_query_user(telegram, member, chat_id):
+def do_query_user(telegram, member, chat_id, message_thread_id=None):
     """
     Show a keyboard
 
@@ -160,6 +160,7 @@ def do_query_user(telegram, member, chat_id):
     result = telegram.send_message(
             chat_id,
             msg,
+            message_thread_id,
             json.dumps(inline_keyboard))
     thread_1 = threading.Thread(target=wait_for_new_user, args=(member,
         chat_id, result))
@@ -203,6 +204,10 @@ def do_telegram_mesage(telegram, payload):
     from_id = payload['message']['from']['id']
     chat_id = payload['message']['chat']['id']
     message_id = payload['message']['message_id']
+    if "message_thread_id" in payload['message']:
+        message_thread_id = payload['message']['message_thread_id']
+    else:
+        message_thread_id = None
     if User.get_bots(from_id):
         telegram.delete_message(chat_id, message_id)
     elif 'entities' in payload['message']:
@@ -213,11 +218,12 @@ def do_telegram_mesage(telegram, payload):
                 end = start + entity['length']
                 command = instruction[start:end - 1]
                 args = instruction[end:]
-                do_telegram_command(chat_id, message_id, from_id, command, args)
+                do_telegram_command(chat_id, message_id, message_thread_id,
+                                    from_id, command, args)
                 break
 
 
-def do_telegram_command(chat_id, message_id, from_id, command, args):
+def do_telegram_command(chat_id, message_id, message_thread_id, from_id, command, args):
     """
     Process a telegram command
 
@@ -242,7 +248,7 @@ def do_telegram_command(chat_id, message_id, from_id, command, args):
                 user = User.get_user(args)
                 if user and user.get_is_bot() is False:
                     message = 'Mission accomplished'
-            telegram.send_message(chat_id, message)
+            telegram.send_message(chat_id, message, message_thread_id)
 
 
 @app.errorhandler(404)

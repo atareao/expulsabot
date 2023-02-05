@@ -14,9 +14,12 @@ class Telegram():
         data = {'chat_id': chat_id, 'message_id': message_id}
         requests.post(url, data=data)
 
-    def send_message(self, chat_id, message, reply_markup=None):
+    def send_message(self, chat_id, message, message_thread_id=None,
+                     reply_markup=None):
         url = URL.format(self._token) + '/sendMessage'
         data = {'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}
+        if message_thread_id:
+            data['message_thread_id'] = message_thread_id
         if reply_markup:
             data['reply_markup'] = reply_markup
         r = requests.post(url, data=data)
