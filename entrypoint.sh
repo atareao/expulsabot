@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2021 Lorenzo Carbonell <a.k.a. atareao>
+# Copyright (c) 2022 Lorenzo Carbonell <a.k.a. atareao>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,4 +21,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-/opt/venv/bin/gunicorn app:app -w 1 --chdir /app/src --threads 1 --access-logfile - -b 0.0.0.0:8000
+# Exit if any command fails
+set -o errexit
+set -o nounset
+
+LOCAL_USER_ID=${LOCAL_USER_ID:-1000}
+LOCAL_GROUP_ID=${LOCAL_GROUP_ID:-1000}
+
+if ! grep -q -E "^dockerus:" /etc/group;
+then
+    echo "=== Create group ==="
+    addgroup -g "$LOCAL_GROUP_ID" -S dockerus
+fi
+
+if ! grep -q -E "^dockerus:" /etc/passwd;
+then
+    echo "=== Create user ==="
+    adduser -u "$LOCAL_USER_ID" -S dockerus -G dockerus
+fi
+echo "=== Chown ownership ==="
+# comment next line if needs root
+chown -R dockerus:dockerus /app
+echo "=== Execute $* ==="
+# comment next line if needs root
+set -- su-exec dockerus "$@"
+exec "$@"
