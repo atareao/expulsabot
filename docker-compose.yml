@@ -5,6 +5,7 @@ services:
     build: ./
     image: atareao/expulsabot:v2.0
     container_name: expulsabot
+    init: true
     restart: unless-stopped
     volumes:
       - ./database:/app/database

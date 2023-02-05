@@ -36,7 +36,7 @@ RUN echo "**** install Python ****" && \
 
 COPY --from=builder /opt /opt
 
-COPY entrypoint.sh su.sh /
+COPY entrypoint.sh run.sh /
 
 WORKDIR /app
 
