@@ -31,12 +31,12 @@ ENV PYTHONUNBUFFERED=1
 RUN echo "**** install Python ****" && \
     apk add --update --no-cache \
             su-exec~=0.2 \
-            python3~=3.10 && \
-    mkdir -p /app/templates /app/static
+            python3~=3.10
 
 COPY --from=builder /opt /opt
 
 COPY entrypoint.sh run.sh /
+COPY src /app/src
 
 WORKDIR /app
 
