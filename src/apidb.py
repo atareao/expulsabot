@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import sqlite3
-import time
-import os
-import sys
+import logging
 
 
 DATABASE = '/app/database/expulsabot.db'
@@ -14,15 +12,11 @@ TIMESTAMP INTEGER,
 IS_BOT INTEGER);
 """
 
-
-def logger(message, force=False):
-    if force or (os.environ['DEBUG'] and os.environ['DEBUG'].lower() == 'true'):
-        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
-        sys.stdout.write('{} | {}\n'.format(timestamp, message))
+logger = logging.getLogger(__name__)
 
 
 def init():
-    logger('Create tables in database')
+    logger.debug('Create tables in database')
     execute(TABLE_USERS)
 
 
@@ -31,14 +25,14 @@ def execute(sqlquery, data=None):
     try:
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
-        logger(sqlquery)
+        logger.debug(sqlquery)
         if data:
             cursor.execute(sqlquery, data)
         else:
             cursor.execute(sqlquery)
         conn.commit()
     except Exception as e:
-        logger(e, True)
+        logger.error(e, True)
     finally:
         if conn:
             conn.close()
@@ -54,7 +48,7 @@ def select(sqlquery, one=False):
             return cursor.fetchone()
         return cursor.fetchall()
     except Exception as e:
-        logger(e, True)
+        logger.error(e, True)
     finally:
         if conn:
             conn.close()
@@ -68,7 +62,7 @@ def check(sqlquery):
         cursor.execute(sqlquery)
         return True
     except Exception as e:
-        logger(e, True)
+        logger.error(e, True)
     finally:
         if conn:
             conn.close()

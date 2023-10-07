@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "expulsabot"
+version = "0.1.0"
+description = ""
+authors = ["Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [
+    { include = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Flask = "^3.0.0"
+gunicorn = "^21.2.0"
+requests = "^2.31.0"
+uvicorn = "^0.23.2"
+
+[tool.poetry.group.dev.dependencies]
+pybuild = "^0.0.1"
+python-dotenv = "^1.0.0"
+debugpy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

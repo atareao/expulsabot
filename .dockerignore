@@ -1,0 +1,10 @@
+./Dockerfile
+./.git/
+./bin/
+./include/
+./lib/
+./lib64/
+./share/
+./test/
+*/__pycache__
+*/.mypy_cache

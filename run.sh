@@ -21,9 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-source /opt/venv/bin/activate
-/opt/venv/bin/gunicorn app:app -w 1 \
-                               --chdir /app/src \
-                               --threads 1 \
-                               --access-logfile - \
-                               -b 0.0.0.0:8000
+gunicorn app:app \
+	-w 1 \
+	--chdir /app \
+	--threads 1 \
+	--access-logfile - \
+	-b 0.0.0.0:8000
