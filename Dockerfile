@@ -1,37 +1,37 @@
 ###############################################################################
 ## Builder
 ###############################################################################
-FROM alpine:3.18 as builder
-
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+FROM alpine:3.21 AS builder
 
 RUN echo "**** install Python ****" && \
     apk add --update --no-cache --virtual \
             .build-deps \
-            gcc~=12.2 \
+            gcc~=14.2 \
             musl-dev~=1.2 \
-            python3-dev~=3.11 \
-            python3~=3.11 \
-            py3-pip~=23.1 && \
-    rm -rf /var/lib/apt/lists/* && \
-    echo "**** install Poetry ****" && \
-    pip install --no-cache-dir poetry==1.6.1
+            python3-dev~=3.12 \
+            python3~=3.12 \
+            uv=~0.5  &&\
+    rm -rf /var/lib/apt/lists/*
 
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
 
-RUN echo "**** install Python dependencies ****" && \
-    poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
+
+# Install the project's dependencies using the lockfile and settings
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
 
 ###############################################################################
 ## Final image
 ###############################################################################
-FROM alpine:3.18
+FROM alpine:3.21
 
 LABEL maintainer="Lorenzo Carbonell <a.k.a. atareao> lorenzo.carbonell.cerezo@gmail.com"
 
@@ -44,7 +44,8 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 RUN echo "**** install Python ****" && \
     apk add --update --no-cache \
-            python3~=3.11 && \
+            tzdata~=2025 \
+            python3~=3.12 && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}

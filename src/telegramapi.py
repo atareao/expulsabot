@@ -8,9 +8,23 @@ URL = 'https://api.telegram.org/bot{}'
 
 
 class Telegram():
-    def __init__(self, token):
+    def __init__(self, token, timeout=300):
         logging.debug("__init__")
         self._token = token
+        self._timeout = timeout
+
+    def get_updates(self, offset=None):
+        logging.debug("get_updates")
+        url = URL.format(self._token) + '/getUpdates'
+        data = {
+            'timeout': self._timeout
+        }
+        if offset:
+            data['offset'] = offset
+        r = requests.get(url, data=data)
+        if r.status_code == 200 and 'ok' in r.json() and r.json()['ok']:
+            return r.json()['result']
+        raise Exception("Telegram API error: %s" % r.text)
 
     def delete_message(self, chat_id, message_id):
         logging.debug("delete_message")

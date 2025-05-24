@@ -21,9 +21,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-gunicorn app:app \
-	-w 1 \
-	--chdir /app \
-	--threads 1 \
-	--access-logfile - \
-	-b 0.0.0.0:8000
+python main.py

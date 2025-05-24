@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+import os
 import sqlite3
 import logging
 
 
-DATABASE = '/app/database/expulsabot.db'
+DATABASE = os.getenv("DATABASE", "expulsabot.db")
 TABLE_USERS = """
 CREATE TABLE IF NOT EXISTS USERS(
 ID INTEGER PRIMARY KEY AUTOINCREMENT,
